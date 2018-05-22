@@ -1,14 +1,20 @@
 #include <CapacitiveSensor.h>
 
 CapacitiveSensor sensor = CapacitiveSensor(12, 13);
+const int stepsPerRot = 200; //???
 int senseData[10]; //cap wire sense data
 int currS = 0;
 int motorRevs = 0; //# of revolutions of stepper motor, 0 is fully extended
-int receivedData =0; //Avgeraged data from HID
+bool dir = true; //true is retract, false is extend
+int receivedData = 0; //Avgeraged data from HID
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
+}
+
+void moveMot(int x){ //rotates motor a certain number of revolutions
+  
 }
 
 void loop() {
@@ -22,6 +28,7 @@ void loop() {
 void serialEvent() {
   while (Serial.available()) {
     receivedData = (int)Serial.read();
+    Serial.println(receivedData);
   }
 }
 
