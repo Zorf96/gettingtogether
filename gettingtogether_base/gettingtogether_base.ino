@@ -6,6 +6,7 @@ const int dirPin = 5;
 
 //////
 const long maxSteps = 10000; //???
+const int dataLength = 10;
 //////
 
 long motorSteps = 0; //current # of revolutions of stepper motor, 0 is fully extended
@@ -16,8 +17,9 @@ bool receivedData = false; //current data from HID, same states as dir
 int test = 0;
 
 //don't mind these
-int senseData[10]; //cap wire sense data
+long senseData[dataLength]; //cap wire sense data
 int currS = 0; //indexing var for senseData
+long thisAvg = 0;
 
 
 
@@ -62,7 +64,7 @@ void setStepperStates() {
   } else {
     targetSteps -= 10;
   }
-  digitalWrite(dirPin,dir);
+  digitalWrite(dirPin, dir);
 }
 
 
@@ -70,15 +72,19 @@ void setStepperStates() {
 void serialEvent() {
   while (Serial.available()) {
     test = Serial.readString().toInt();
+    Serial.print("data in: ");
     Serial.println(receivedData);
   }
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  //addToArr(senseData, currS, (int)sensor.capacitiveSensor(30));
-  //int thisAvg = avg(senseData);
-  //Serial.println(thisAvg);
+  int x = sensor.capacitiveSensor(30);
+  addToArr(x);
+  thisAvg = avg();
+  delay(10);
+  //  Serial.print("cap sense: ");
+  Serial.println(thisAvg);
   setStepperStates();
   targetSteps = test;
   Serial.print(motorSteps);
@@ -96,19 +102,19 @@ void loop() {
 
 
 //invisible funcs
-int avg (int x[10]) {
-  int sum = 0;
-  for (int i = 0; i++; i < 10) {
-    sum += x[i];
+long avg () {
+  long sum = 0;
+  for (int i = 0; i < dataLength; i++) {
+    sum += senseData[i];
   }
-  return sum / 10;
+  return sum / dataLength ;
 }
 
-void addToArr(int x[], int curr, int add) {
-  x [curr] = add;
-  curr ++;
-  if (curr > 10) {
-    curr = 0;
+void addToArr(long add) {
+  senseData[currS] = add;
+  currS ++;
+  if (currS > dataLength - 1) {
+    currS = 0;
   }
 }
 
